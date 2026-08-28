@@ -9,7 +9,7 @@ from preprocessing import clean_raw_data, build_preprocessor
 
 # Load the training data and the preprocessor
 train_df = pd.read_csv(os.path.join(DATA_RAW, "train.csv"))
-preprocessor = joblib.load(os.path.join(MODELS_DIR, "preprocessor.joblib"))
+preprocessor = joblib.load(os.path.join(MODELS_DIR, "preprocessor2.joblib"))
 
 # Drop the outlier and clean the training data
 train_df = train_df.drop(index=1298)
@@ -36,3 +36,5 @@ for max_depth in [None, 3, 4, 5, 6]:
 
     print(
         f"XGBRegressor n_estimators = {num_est}, learning_rate = {lr}, max_depth = {max_depth}: avg RMSE = {-scores.mean():.0f}, fold range = {-scores.max():.0f} - {-scores.min():.0f}")
+
+# Best was num_est = 100, lr = 0.1 and max_depth = 3

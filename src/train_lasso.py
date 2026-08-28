@@ -29,3 +29,5 @@ for alpha in [100, 150, 200, 250, 300]:
                              scoring="neg_root_mean_squared_error")
     print(
         f"Lasso alpha = {alpha}: avg RMSE = {-1*scores.mean():.0f}, fold range = {-1*scores.max():.0f} - {-1*scores.min():.0f}")
+
+# Best was alpha = 200

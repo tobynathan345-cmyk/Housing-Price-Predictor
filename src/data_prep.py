@@ -14,8 +14,8 @@ preprocessor = build_preprocessor(clean_train_df)
 
 X_transformed = preprocessor.fit_transform(clean_train_df)
 
-joblib.dump(preprocessor, os.path.join(MODELS_DIR, "preprocessor.joblib"))
+joblib.dump(preprocessor, os.path.join(MODELS_DIR, "preprocessor2.joblib"))
 
-preprocessor_path = os.path.join(MODELS_DIR, "preprocessor.joblib")
+preprocessor_path = os.path.join(MODELS_DIR, "preprocessor2.joblib")
 print(
-    f"Preprocessor saved to: {os.path.join(MODELS_DIR, "preprocessor.joblib")}")
+    f"Preprocessor saved to: {os.path.join(MODELS_DIR, "preprocessor2.joblib")}")

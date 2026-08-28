@@ -20,7 +20,7 @@ X = clean_train_df.drop(columns=["SalePrice"])
 y = clean_train_df["SalePrice"]
 
 # Build our combined pipeline of preprocessing and the model and loop through different max_depth's
-num_est = 500
+num_est = 100
 
 for max_depth in [None, 5, 10, 15, 20]:
     random_forest_pipeline = Pipeline(steps=[

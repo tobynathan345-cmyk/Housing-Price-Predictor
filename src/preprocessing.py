@@ -15,8 +15,20 @@ def clean_raw_data(df):
     columns_to_drop = missing_counts[missing_counts > 600].index
     df = df.drop(columns=columns_to_drop)
 
-    # Step 2: Manually assign the the year the house was built to the missing values in GarageYrBlt
+    # Step 2: Feature engineering, create a new variable TotalSF, SaleAge, TotalBath and LastRemod
+    df["TotalSF"] = df["TotalBsmtSF"] + df["1stFlrSF"] + df["2ndFlrSF"]
+    df["SaleAge"] = df["YrSold"] - df["YearBuilt"]
+    df["TotalBath"] = df["FullBath"] + 0.5*df["HalfBath"] + \
+        df["BsmtFullBath"] + 0.5*df["BsmtHalfBath"]
+    df["LastRemod"] = df["YrSold"] - df["YearRemodAdd"]
+
+    df = df.drop(columns=["TotalBsmtSF", "1stFlrSF", "2ndFlrSF", "YrSold",
+                 "FullBath", "HalfBath", "BsmtFullBath", "BsmtHalfBath", "YearRemodAdd"])
+
+    # Step 3: Manually assign the the year the house was built to the missing values in GarageYrBlt
     df["GarageYrBlt"] = df["GarageYrBlt"].fillna(df["YearBuilt"])
+
+    df = df.drop(columns=["YearBuilt"])
 
     return df
 
