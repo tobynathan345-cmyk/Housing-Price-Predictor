@@ -9,7 +9,7 @@ from preprocessing import clean_raw_data, build_preprocessor
 
 # Load the training data and the preprocessor
 train_df = pd.read_csv(os.path.join(DATA_RAW, "train.csv"))
-preprocessor = joblib.load(os.path.join(MODELS_DIR, "preprocessor2.joblib"))
+preprocessor = joblib.load(os.path.join(MODELS_DIR, "preprocessor.joblib"))
 
 # Drop the outlier and clean the training data
 train_df = train_df.drop(index=1298)
@@ -22,6 +22,8 @@ y = clean_train_df["SalePrice"]
 # Build our combined pipeline of preprocessing and the model and loop through different n_estimators
 lr = 0.1
 num_est = 100
+
+"""
 
 for max_depth in [None, 3, 4, 5, 6]:
     xgb_pipeline = Pipeline(steps=[
@@ -36,5 +38,16 @@ for max_depth in [None, 3, 4, 5, 6]:
 
     print(
         f"XGBRegressor n_estimators = {num_est}, learning_rate = {lr}, max_depth = {max_depth}: avg RMSE = {-scores.mean():.0f}, fold range = {-scores.max():.0f} - {-scores.min():.0f}")
-
+"""
 # Best was num_est = 100, lr = 0.1 and max_depth = 3
+
+final_xgb_pipeline = Pipeline(steps=[
+    ("preprocessing", preprocessor),
+    ("model", XGBRegressor(n_estimators=num_est, learning_rate=0.1, max_depth=3))
+])
+
+model = final_xgb_pipeline.fit(X, y)
+
+model_path = os.path.join(MODELS_DIR, "final_xgb_model.joblib")
+joblib.dump(model, model_path)
+print(f"Final XGBoost model saved to: {model_path}")

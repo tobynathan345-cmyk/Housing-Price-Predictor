@@ -10,12 +10,12 @@ from paths import DATA_RAW
 
 
 def clean_raw_data(df):
-    # Step 1: same as before, remove columns with more that ~40% missing data points.
-    missing_counts = df.isnull().sum()
-    columns_to_drop = missing_counts[missing_counts > 600].index
-    df = df.drop(columns=columns_to_drop)
+    # same as before, remove columns with more that ~40% missing data points.
+    columns_to_drop = ["PoolQC", "MiscFeature",
+                       "Alley", "Fence", "MasVnrType", "FireplaceQu"]
+    df = df.drop(columns=columns_to_drop, errors="ignore")
 
-    # Step 2: Feature engineering, create a new variable TotalSF, SaleAge, TotalBath and LastRemod
+    # Feature engineering, create a new variable TotalSF, SaleAge, TotalBath and LastRemod
     df["TotalSF"] = df["TotalBsmtSF"] + df["1stFlrSF"] + df["2ndFlrSF"]
     df["SaleAge"] = df["YrSold"] - df["YearBuilt"]
     df["TotalBath"] = df["FullBath"] + 0.5*df["HalfBath"] + \
@@ -25,7 +25,7 @@ def clean_raw_data(df):
     df = df.drop(columns=["TotalBsmtSF", "1stFlrSF", "2ndFlrSF", "YrSold",
                  "FullBath", "HalfBath", "BsmtFullBath", "BsmtHalfBath", "YearRemodAdd"])
 
-    # Step 3: Manually assign the the year the house was built to the missing values in GarageYrBlt
+    # Manually assign the the year the house was built to the missing values in GarageYrBlt
     df["GarageYrBlt"] = df["GarageYrBlt"].fillna(df["YearBuilt"])
 
     df = df.drop(columns=["YearBuilt"])
@@ -36,7 +36,7 @@ def clean_raw_data(df):
 
 
 def build_preprocessor(df):
-    # Step 3.1: Build Imputers for the numerical and categorical columns with missing values and and values that don't apply
+    # Build Imputers for the numerical and categorical columns with missing values and and values that don't apply
     median_transformer = SimpleImputer(strategy="median")
     numerical_missing_transformer = SimpleImputer(
         strategy="constant", fill_value=0)
@@ -44,7 +44,7 @@ def build_preprocessor(df):
     categorical_missing_transformer = SimpleImputer(
         strategy="constant", fill_value="None")
 
-    # Step 3.2: Build pipeline to impute and encode the categorical data so that it can be passed into our model
+    # Build pipeline to impute and encode the categorical data so that it can be passed into our model
     none_fill_pipeline = Pipeline(steps=[
         ("impute", categorical_missing_transformer),
         ("encode", OneHotEncoder(handle_unknown="ignore", sparse_output=False))
@@ -55,7 +55,7 @@ def build_preprocessor(df):
         ("encode", OneHotEncoder(handle_unknown="ignore", sparse_output=False))
     ])
 
-    # Step 3.3: Organise the training data into the different categories that need to be imputed (and encoded for the categorical data)
+    # Organise the training data into the different categories that need to be imputed (and encoded for the categorical data)
     garage_bsmt_columns = [
         col for col in df.columns if "Garage" in col or "Bsmt" in col]
     garage_bsmt_numeric_columns = [
@@ -70,12 +70,32 @@ def build_preprocessor(df):
         if df[col].dtype == "str" and col != "Electrical"
     ]
 
-    # Step 3.4: Our preprocessor which groups all the data prep tasks into one place to allow for easily reusable code
+    all_handled_columns = (["LotFrontage", "Electrical"] +
+                           zero_fill_columns + categorical_none_columns)
+
+    remaining_columns = [
+        col for col in df.columns if col not in all_handled_columns]
+
+    remaining_numeric = [
+        col for col in remaining_columns if df[col].dtype in ("int64", "float64")]
+
+    remaining_categorical = [
+        col for col in remaining_columns if df[col].dtype == "str"]
+
+    catch_all_numeric = SimpleImputer(strategy="median")
+    catch_all_categorical_pipeline = Pipeline(steps=[
+        ("impute", mode_transformer),
+        ("encode", OneHotEncoder(handle_unknown="ignore", sparse_output=False))
+    ])
+
+    # Our preprocessor which groups all the data prep tasks into one place to allow for easily reusable code
     preprocessor = ColumnTransformer(transformers=[
         ("median_fill", median_transformer, ["LotFrontage"]),
         ("mode_fill", mode_fill_pipeline, ["Electrical"]),
         ("zero_fill", numerical_missing_transformer, zero_fill_columns),
-        ("none_fill", none_fill_pipeline, categorical_none_columns)
+        ("none_fill", none_fill_pipeline, categorical_none_columns),
+        ("catch_all_numeric", catch_all_numeric, remaining_numeric),
+        ("catch_all_categorical", catch_all_categorical_pipeline, remaining_categorical)
     ], remainder="passthrough")
 
     preprocessor.set_output(transform="pandas")

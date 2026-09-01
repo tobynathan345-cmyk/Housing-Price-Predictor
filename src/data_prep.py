@@ -8,14 +8,15 @@ train_df = pd.read_csv(os.path.join(DATA_RAW, "train.csv"))
 
 train_df = train_df.drop(index=1298)
 
-clean_train_df = clean_raw_data(train_df)
+X = train_df.drop(columns=["SalePrice"])
 
-preprocessor = build_preprocessor(clean_train_df)
+X_clean = clean_raw_data(X)
 
-X_transformed = preprocessor.fit_transform(clean_train_df)
+preprocessor = build_preprocessor(X_clean)
 
-joblib.dump(preprocessor, os.path.join(MODELS_DIR, "preprocessor2.joblib"))
+X_transformed = preprocessor.fit_transform(X_clean)
 
-preprocessor_path = os.path.join(MODELS_DIR, "preprocessor2.joblib")
+preprocessor_path = os.path.join(MODELS_DIR, "preprocessor.joblib")
+joblib.dump(preprocessor, preprocessor_path)
 print(
-    f"Preprocessor saved to: {os.path.join(MODELS_DIR, "preprocessor2.joblib")}")
+    f"Preprocessor saved to: {preprocessor_path}")
