@@ -9,7 +9,7 @@ from preprocessing import clean_raw_data
 
 # Load the training data and the preprocessor
 test_df = pd.read_csv(os.path.join(DATA_RAW, "test.csv"))
-model = joblib.load(os.path.join(MODELS_DIR, "final_xgb_model.joblib"))
+model = joblib.load(os.path.join(MODELS_DIR, "final_ridge_model.joblib"))
 
 clean_test_df = clean_raw_data(test_df)
 
@@ -22,6 +22,6 @@ submission = pd.DataFrame({
 
 print(submission.head())
 
-submission_path = os.path.join(project_root, "submission_xgb.csv")
+submission_path = os.path.join(project_root, "submission_ridge.csv")
 submission.to_csv(submission_path, index=False)
 print(f"Submission saved to: {submission_path}")

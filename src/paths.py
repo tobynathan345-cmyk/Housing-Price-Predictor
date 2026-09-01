@@ -1,5 +1,4 @@
 import os
-import pandas as pd
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(script_dir)

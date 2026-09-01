@@ -4,7 +4,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import OneHotEncoder
-from paths import DATA_RAW
 
 # Function to clean the raw data
 
@@ -83,8 +82,9 @@ def build_preprocessor(df):
         col for col in remaining_columns if df[col].dtype == "str"]
 
     catch_all_numeric = SimpleImputer(strategy="median")
+    catch_all_mode_transformer = SimpleImputer(strategy="most_frequent")
     catch_all_categorical_pipeline = Pipeline(steps=[
-        ("impute", mode_transformer),
+        ("impute", catch_all_mode_transformer),
         ("encode", OneHotEncoder(handle_unknown="ignore", sparse_output=False))
     ])
 
