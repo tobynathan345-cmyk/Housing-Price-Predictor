@@ -5,3 +5,5 @@ data/raw/
 data/processed/
 archive/
 inspections/
+submission_ridge.csv
+submission_xgb.py
