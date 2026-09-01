@@ -1,8 +1,8 @@
 import os
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(script_dir)
+PROJECT_ROOT = os.path.dirname(script_dir)
 
-DATA_RAW = os.path.join(project_root, "data", "raw")
-DATA_PROCESSED = os.path.join(project_root, "data", "processed")
-MODELS_DIR = os.path.join(project_root, "models")
+DATA_RAW = os.path.join(PROJECT_ROOT, "data", "raw")
+DATA_PROCESSED = os.path.join(PROJECT_ROOT, "data", "processed")
+MODELS_DIR = os.path.join(PROJECT_ROOT, "models")
